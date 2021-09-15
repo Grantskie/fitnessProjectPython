@@ -53,6 +53,19 @@ def printFooterBackFor():
     printBorderVertStr("< Back                                         Forward >")
     printBorderHorz(1)
 
-def printFooterLogout():
-    printBorderVertStr("< Logout                                               >")
+def printFooterBackSave():
+    printBorderVertStr("< Back                                            Save >")
     printBorderHorz(1)
+
+def printFooterLogout():
+    printBorderVertStr("< Logout                                                ")
+    printBorderHorz(1)
+
+def dayColumn(dayStr):
+    max = 14
+    diff = max - len(dayStr)
+    resStr = "| " + dayStr
+    for i in range(diff - 1):
+        resStr += " "
+    resStr += "|"
+    return resStr

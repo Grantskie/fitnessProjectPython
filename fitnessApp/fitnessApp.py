@@ -1,24 +1,15 @@
 import os
 import mysql.connector
-import databaseTools
+import cliPages
 import aesthetics
-
+import User
+import Routine
 
 cnx = mysql.connector.connect(user='scalaFitnessApp', password='ScalaFitness1!',
                                   host='127.0.0.1',
                                   database='fitnessapp')
 cursor = cnx.cursor()
 
-
-def openingScreen():
-    os.system('cls')
-    aesthetics.printHeader("Welcome to the Fitness App!")
-    aesthetics.printBorderVert(1)
-    aesthetics.printBorderVertStr("1) Sign Up")
-    aesthetics.printBorderVertStr("2) Login")
-    aesthetics.printBorderVert(1)
-    aesthetics.printBorderHorz(1)
-    aesthetics.printFooterExit()
 
 def usernameCheck(username, cursor) -> bool:
     test = True
@@ -30,26 +21,14 @@ def usernameCheck(username, cursor) -> bool:
             test = False
     return test
 
-def signUpPage(cursor, cnx):
-    os.system('cls')
-    aesthetics.printHeader("Lets get you signed up!")
-    aesthetics.printBorderVert(1)
-    aesthetics.printBorderVertStr("Enter a username")
-    aesthetics.printBorderVert(1)
-    aesthetics.printBorderHorz(1)
-    aesthetics.printFooterBack()
+def signUp(cursor, cnx):
+    cliPages.signUpPage()
     username = input(">Input<")
     if username != '<':
         test = usernameCheck(username, cursor)
         if test == False:
             while True:
-                os.system('cls')
-                aesthetics.printHeader("That username has been taken")
-                aesthetics.printBorderVert(1)
-                aesthetics.printBorderVertStr("Enter a username")
-                aesthetics.printBorderVert(1)
-                aesthetics.printBorderHorz(1)
-                aesthetics.printFooterBack()
+                cliPages.signUpPage(test)
                 username = input(">Input<")
                 if username != '<':
                     test = usernameCheck(username, cursor)
@@ -65,27 +44,19 @@ def signUpPage(cursor, cnx):
             cursor.execute(insertUserQuery)
             cnx.commit()
 
-def loginPage(cursor):
+def login(cursor):
     checkTestPwd = False
     checkTestUser = False
     while True:
-        os.system('cls')
-        if checkTestUser == False:
-            aesthetics.printHeader("Login")
-        else:
-            aesthetics.printHeader("Unknown username - Please create an account")
-        aesthetics.printBorderVert(1)
-        aesthetics.printBorderVertStr("Enter your username")
-        aesthetics.printBorderVert(1)
-        aesthetics.printBorderHorz(1)
-        aesthetics.printFooterBack()
+        cliPages.loginPage(checkTestUser)
         username = input(">Input<")
         query = f"SELECT username, password FROM login WHERE username = \'{username}\'"
         cursor.execute(query)
-        for x in cursor:
-            if x[0] == None:
-                checkTestUser = True
-            else:
+        test = cursor.fetchall()
+        if len(test) == 0:
+            checkTestUser = True
+        else:
+            for x in test:
                 passwordEntered = x[1]
                 while True:
                     os.system('cls')
@@ -104,34 +75,59 @@ def loginPage(cursor):
         if username == '<':
             break
 
-def mainPage(username):
-    os.system('cls')
-    aesthetics.printHeader(f"Welcome {username}")
-    aesthetics.printBorderVert(2)
-    aesthetics.printBorderVertStr("1) Create Routine")
-    aesthetics.printBorderVertStr("2) View Routines  ")
-    aesthetics.printBorderVert(2)
-    aesthetics.printBorderHorz(1)
-    aesthetics.printFooterLogout()
+def createRoutine(cursor, cnx):
+    cliPages.createRoutinePage()
+    userInput = input(">Input<")
+    if userInput != '<':
+        routine2 = Routine.Routine(username, userInput, cursor)
+        while True:
+            cliPages.viewRoutineCreationPage(routine2)
+            userInput = input(">Input<")
+            if userInput == '<':
+                break
+            elif userInput == '>':
+                print('test')
+                routine2.insertRoutine(cursor, cnx)
+                break
+            else:
+                routine2.addDay(userInput)
+
+def viewRoutine(user):
+    cliPages.viewRoutinePage(user)
+
 
 while True:
-    openingScreen()
+    cliPages.openingPage()
     userInput = input(">Input<")
     if userInput == '<':
         break
     elif userInput == '1':
-        signUpPage(cursor, cnx)
+        signUp(cursor, cnx)
     elif userInput == '2':
-        username = loginPage(cursor)
+        username = login(cursor)
+        user = User.User(username, cursor)
         while True:
-            mainPage(username)
+            cliPages.mainPage(username)
             userInput = input(">Input<")
             if userInput == '<':
                 break
             elif userInput == '1':
-                pass
+                createRoutine(cursor, cnx)
             elif userInput == '2':
-                pass
+                while True:
+                    user.updateRoutines()
+                    viewRoutine(user)
+                    userInput = input(">Input<")
+                    if userInput == '<':
+                        break
+                    routineList = user.getRoutines()
+                    try:
+                        if int(userInput) >= 1 or int(userInput) <= len(routineList) + 1:
+                            routine = Routine.Routine(user.username, routineList[int(userInput) - 1], cursor)
+                            cliPages.viewSingleRoutinePage(routine)
+                            input("any")
+                    except:
+                        print("Please input an acceptable option")
             else:
                 print("Please input an acceptable option")
     else:
