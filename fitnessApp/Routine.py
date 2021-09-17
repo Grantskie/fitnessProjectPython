@@ -80,7 +80,19 @@ class Routine:
 
     def getRoutineName(self):
         return self.routineName
+
     def getExerciseSet(self):
-        pass
-    def getRoutineId(self):
-        pass
+        returnSet = {}
+        for i in range(6):
+            for j in self.routineList(i):
+                returnSet.add()
+        return returnSet
+
+    def getRoutineId(self, exercise, amount, cursor):
+        routineId = 0
+        selectId = f"SELECT routineId FROM routine WHERE username = \'{self.username}\' AND routineName = \'{self.routineName}\' AND exercise = \'{exercise}\' AND amount = \'{amount}\' ORDER BY routineId DESC"
+        cursor.execute(selectId)
+        resultSet = cursor.fetchall()
+        for x in resultSet:
+            routineId = x[0]
+        return routineId

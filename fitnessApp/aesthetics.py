@@ -57,6 +57,10 @@ def printFooterBackSave():
     printBorderVertStr("< Back                                            Save >")
     printBorderHorz(1)
 
+def printFooterBackData():
+    printBorderVertStr("< Back                                            Data >")
+    printBorderHorz(1)
+
 def printFooterLogout():
     printBorderVertStr("< Logout                                                ")
     printBorderHorz(1)

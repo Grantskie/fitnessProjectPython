@@ -83,4 +83,4 @@ def viewSingleRoutinePage(routine):
     os.system('cls')
     aesthetics.printHeader(routine.getRoutineName())
     routine.displayRoutine()
-    aesthetics.printFooterBack()
+    aesthetics.printFooterBackData()

@@ -93,7 +93,20 @@ def createRoutine(cursor, cnx):
                 routine2.addDay(userInput)
 
 def viewRoutine(user):
-    cliPages.viewRoutinePage(user)
+    while True:
+        user.updateRoutines()
+        cliPages.viewRoutinePage(user)
+        userInput = input(">Input<")
+        if userInput == '<':
+            break
+        routineList = user.getRoutines()
+        try:
+            if int(userInput) >= 1 or int(userInput) <= len(routineList) + 1:
+                routine = Routine.Routine(user.username, routineList[int(userInput) - 1], cursor)
+                cliPages.viewSingleRoutinePage(routine)
+                return input(">Input<")
+        except:
+            print("Please input an acceptable option")
 
 
 while True:
@@ -114,20 +127,7 @@ while True:
             elif userInput == '1':
                 createRoutine(cursor, cnx)
             elif userInput == '2':
-                while True:
-                    user.updateRoutines()
-                    viewRoutine(user)
-                    userInput = input(">Input<")
-                    if userInput == '<':
-                        break
-                    routineList = user.getRoutines()
-                    try:
-                        if int(userInput) >= 1 or int(userInput) <= len(routineList) + 1:
-                            routine = Routine.Routine(user.username, routineList[int(userInput) - 1], cursor)
-                            cliPages.viewSingleRoutinePage(routine)
-                            input("any")
-                    except:
-                        print("Please input an acceptable option")
+                userInput = viewRoutine(user)
             else:
                 print("Please input an acceptable option")
     else:
